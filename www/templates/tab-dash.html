@@ -3,11 +3,11 @@
     <div class="list">
       <label class="item item-input item-stacked-label">
         <span class="input-label">Phone Number</span>
-        <input type="text" placeholder="Enter phone number">
+        <input type="text" ng-model="user.number" placeholder="Enter phone number">
       </label>
       <ion-toggle ng-model="airplaneMode" toggle-class="toggle-calm">Send GPS Coordinates</ion-toggle>
     </div>
-    <button class="button button-block button-large button-assertive">
+    <button class="button button-block button-large button-assertive" ng-click="sendHelpText()">
       Help
     </button>
     <button class="button button-block button-large button-positive">
