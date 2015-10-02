@@ -1,66 +1,58 @@
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('DashCtrl', function($scope, $cordovaSms, $cordovaContacts, $ionicPopup) {
+.controller('DashCtrl', function($scope, $cordovaSms, $cordovaContacts, $ionicPopup, $cordovaGeolocation) {
 
   $scope.user = {};
 
   document.addEventListener("deviceready", function () {
 
+    var showAlert = function() {
+      var alertPopup = $ionicPopup.alert({
+        title: 'Message sent!!'
+      });
+    };
+
     $cordovaContacts.find({ multiple: true}).then(function(allContacts) { //omitting parameter to .find() causes all contacts to be returned
       $scope.contacts = allContacts.filter(function (phoneContact){
         return Array.isArray(phoneContact.phoneNumbers);
       });
+      console.log($scope.contacts);
     });
 
-    $scope.sendHelpText = function () {
-      var textMessage = "Help Me!!";
-      var options = {
-        replaceLineBreaks: false, // true to replace \n by a new line, false by default
-        android: {
-          //intent: 'INTENT'  // send SMS with the native android SMS messaging
-          intent: '' // send SMS without open any other app
-        }
-      };
+    var sendText = function (message) {
+      var posOptions = { timeout: 10000, enableHighAccuracy: false };
+      $cordovaGeolocation
+        .getCurrentPosition(posOptions)
+        .then(function (position) {
+          var location = String(position.coords.latitude) + ',' + String(position.coords.longitude);
+          $scope.gpsLocation = location;
 
-      $cordovaSms
-        .send($scope.user.number, textMessage, options)
-        .then(function() {
-          $scope.user.number = '';
-          showAlert();
-        }, function(error) {
-          console.log('Error!!');
-        }
-      );
+          var textMessage = message + '  I am at https://maps.google.com/?q=' + location;
+          var options = { android: { intent: '' }};
+
+          $cordovaSms
+            .send($scope.user.number, textMessage, options)
+            .then(function() {
+              showAlert();
+            }, function(error) {
+              $scope.gpsLocation = err.message;
+            });
+
+        }, function(err) {
+          $scope.gpsLocation = err.message;
+        });
     };
 
     $scope.sendOkayText = function() {
-      var textMessage = "I am okay :) ";
-      var options = {
-        replaceLineBreaks: false, // true to replace \n by a new line, false by default
-        android: {
-          //intent: 'INTENT'  // send SMS with the native android SMS messaging
-          intent: '' // send SMS without open any other app
-        }
-      };
+      sendText("I'm Okay. :-)");
+    };
 
-      $cordovaSms
-        .send($scope.user.number, textMessage, options)
-        .then(function() {
-          $scope.user.number = '';
-          showAlert();
-        }, function(error) {
-          console.log('Error!!');
-        }
-      );
-    }
-
-     var showAlert = function() {
-       var alertPopup = $ionicPopup.alert({
-         title: 'Message sent!!'
-         //template: 'It might taste good'
-       });
-     };
+    $scope.sendHelpText = function() {
+      sendText('Help me!!');
+    };
   });
+
+
 })
 
 .controller('ChatsCtrl', function($scope, Chats) {
