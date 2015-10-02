@@ -1,9 +1,22 @@
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('DashCtrl', function($scope, $cordovaSms) {
+.controller('DashCtrl', function($scope, $cordovaSms, $cordovaContacts) {
 
-  
   $scope.user = {};
+  console.log("HERE");
+
+  // $scope.getAllContacts = function() {
+    document.addEventListener("deviceready", function () {
+      console.log("Trying to get all contacts");
+      console.log($cordovaContacts);
+      $cordovaContacts.find({ multiple: true}).then(function(allContacts) { //omitting parameter to .find() causes all contacts to be returned
+        $scope.contacts = allContacts.filter(function (phoneContact){
+          return Array.isArray(phoneContact.phoneNumbers);
+        });
+        console.log($scope.contacts);
+      });
+    });
+  // };
 
   $scope.sendHelpText = function () {
     var textMessage = "Help Me!!";
@@ -31,6 +44,8 @@ angular.module('starter.controllers', ['ngCordova'])
         // An error occurred
       });
     });
+
+
   };
 
 })
