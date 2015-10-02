@@ -1,53 +1,66 @@
 angular.module('starter.controllers', ['ngCordova'])
 
-.controller('DashCtrl', function($scope, $cordovaSms, $cordovaContacts) {
+.controller('DashCtrl', function($scope, $cordovaSms, $cordovaContacts, $ionicPopup) {
 
   $scope.user = {};
-  console.log("HERE");
 
-  // $scope.getAllContacts = function() {
-    document.addEventListener("deviceready", function () {
-      console.log("Trying to get all contacts");
-      console.log($cordovaContacts);
-      $cordovaContacts.find({ multiple: true}).then(function(allContacts) { //omitting parameter to .find() causes all contacts to be returned
-        $scope.contacts = allContacts.filter(function (phoneContact){
-          return Array.isArray(phoneContact.phoneNumbers);
-        });
-        console.log($scope.contacts);
+  document.addEventListener("deviceready", function () {
+
+    $cordovaContacts.find({ multiple: true}).then(function(allContacts) { //omitting parameter to .find() causes all contacts to be returned
+      $scope.contacts = allContacts.filter(function (phoneContact){
+        return Array.isArray(phoneContact.phoneNumbers);
       });
     });
-  // };
 
-  $scope.sendHelpText = function () {
-    var textMessage = "Help Me!!";
-    var options = {
-            replaceLineBreaks: false, // true to replace \n by a new line, false by default
-            android: {
-                //intent: 'INTENT'  // send SMS with the native android SMS messaging
-                intent: '' // send SMS without open any other app
-            }
+    $scope.sendHelpText = function () {
+      var textMessage = "Help Me!!";
+      var options = {
+        replaceLineBreaks: false, // true to replace \n by a new line, false by default
+        android: {
+          //intent: 'INTENT'  // send SMS with the native android SMS messaging
+          intent: '' // send SMS without open any other app
+        }
+      };
+
+      $cordovaSms
+        .send($scope.user.number, textMessage, options)
+        .then(function() {
+          $scope.user.number = '';
+          showAlert();
+        }, function(error) {
+          console.log('Error!!');
+        }
+      );
     };
-    console.log('Trying to send!!');
-    console.log($cordovaSms);
 
-    document.addEventListener("deviceready", function () {
-    console.log($scope.user.number, textMessage);
+    $scope.sendOkayText = function() {
+      var textMessage = "I am okay :) ";
+      var options = {
+        replaceLineBreaks: false, // true to replace \n by a new line, false by default
+        android: {
+          //intent: 'INTENT'  // send SMS with the native android SMS messaging
+          intent: '' // send SMS without open any other app
+        }
+      };
 
-    $cordovaSms
-      .send($scope.user.number, textMessage, options)
-      .then(function() {
-        console.log('Succes!!');
-        $scope.user.number = '';
-      }, function(error) {
-        console.log('Error!!');
-        
-        // An error occurred
-      });
-    });
+      $cordovaSms
+        .send($scope.user.number, textMessage, options)
+        .then(function() {
+          $scope.user.number = '';
+          showAlert();
+        }, function(error) {
+          console.log('Error!!');
+        }
+      );
+    }
 
-
-  };
-
+     var showAlert = function() {
+       var alertPopup = $ionicPopup.alert({
+         title: 'Message sent!!'
+         //template: 'It might taste good'
+       });
+     };
+  });
 })
 
 .controller('ChatsCtrl', function($scope, Chats) {

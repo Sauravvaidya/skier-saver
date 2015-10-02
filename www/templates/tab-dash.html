@@ -4,8 +4,6 @@
         <label class="item item-input item-select">
           <div class="input-label">Phone Number</div>
           <select ng-model="user.number" ng-options="contact.phoneNumbers[0].value as contact.displayName for contact in contacts |orderBy :'displayName'">
-            <!-- <option ng-if="contact.displayName.length>0" 
-            ng-repeat="contact in contacts |orderBy :'displayName'" ng-value="contact.phoneNumbers[0].value">{{contact.displayName}}</option> -->
           </select>
         </label>
 
@@ -14,7 +12,7 @@
     <button class="button button-block button-large button-assertive" ng-click="sendHelpText()">
       Help
     </button>
-    <button class="button button-block button-large button-positive">
+    <button class="button button-block button-large button-positive" ng-click="sendOkayText()">
       I'm Okay!
     </button>
   </ion-content>
